@@ -10,11 +10,16 @@ app = Flask(__name__)
 #     return jsonify({"message": "Hello, world!"})
 @app.route("/fetch-data")
 def fetch_data():
-    # Use get_db to create a session
-    with get_db() as session:
-        # Example query
-        result = session.execute("SELECT * FROM shipping_rates")  # Replace with your actual table name
+    # Get a session from the generator
+    db = next(get_db())
+    
+    try:
+        # Execute the query
+        result = db.execute("SELECT * FROM shipping_rates")  # Replace with your actual table name
         data = [dict(row) for row in result]
+    finally:
+        # Close the session after the query
+        db.close()
 
     return jsonify(data)
 
