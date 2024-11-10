@@ -2,6 +2,7 @@
 from flask import Flask, jsonify
 import os
 from database import get_db
+from sqlalchemy import text 
 
 app = Flask(__name__)
 
@@ -15,7 +16,7 @@ def fetch_data():
     
     try:
         # Execute the query
-        result = db.execute("SELECT * FROM shipping_rates")  # Replace with your actual table name
+        result = db.execute(text("SELECT * FROM shipping_rates"))  # Replace with your actual table name
         data = [dict(row) for row in result]
     finally:
         # Close the session after the query
