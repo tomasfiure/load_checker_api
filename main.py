@@ -17,7 +17,7 @@ def fetch_data():
     try:
         # Execute the query
         result = db.execute(text("SELECT * FROM shipping_rates"))  # Replace with your actual table name
-        data = [dict(row) for row in result]
+        data = [dict(row) for row in result.mappings()]
     finally:
         # Close the session after the query
         db.close()
