@@ -56,6 +56,42 @@ def get_load_details(reference_number):
     finally:
         db.close()
 
+@app.route("/search", methods=["GET"])
+@require_api_key
+def search_loads():
+    """
+    Search loads by a single query parameter (e.g., origin, destination, or equipment_type).
+    """
+    # Get query parameters
+    query_params = request.args
+
+    # Validate that exactly one query parameter is provided
+    if len(query_params) != 1:
+        return jsonify({"error": "Exactly one query parameter is required."}), 400
+
+    # Extract the single parameter and its value
+    param_key, param_value = next(iter(query_params.items()))
+
+    db = next(get_db())
+    
+    try:
+        # Build the SQL query dynamically
+        query = f"SELECT * FROM shipping_rates WHERE {param_key} = :{param_key}"
+
+        # Execute the query
+        results = db.execute(text(query), {param_key: param_value}).mappings().fetchall()
+
+        # If no records are found, return a 404 error
+        if not results:
+            return jsonify({"error": f"No loads found for {param_key} = {param_value}"}), 404
+
+        # Convert the results to a list of dictionaries and return as JSON
+        loads = [dict(result) for result in results]
+        return jsonify(loads)
+
+    finally:
+        db.close()
+        
 @app.route("/carrier", methods=["GET"])
 def get_carrier_info():
     """
