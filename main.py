@@ -65,9 +65,12 @@ def search_loads():
     # Get query parameters
     query_params = request.args
 
+    # Exclude `api_key` if it is provided
+    query_params = {key: value for key, value in query_params.items() if key != "api_key"}
+
     # Validate that exactly one query parameter is provided
     if len(query_params) != 1:
-        return jsonify({"error": "Exactly one query parameter is required."}), 400
+        return jsonify({"error": "Exactly one query parameter is required, excluding 'api_key'."}), 400
 
     # Extract the single parameter and its value
     param_key, param_value = next(iter(query_params.items()))
