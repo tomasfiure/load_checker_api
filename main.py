@@ -55,6 +55,31 @@ def get_load_details(reference_number):
     finally:
         db.close()
 
+@app.route("/carrier", methods=["GET"])
+def get_carrier_info():
+    """
+    Makes a GET call to the FMCAS carrier service with the provided API key and MC number.
+    """
+    # Extract query parameters
+    webKey = request.args.get('webKey')
+    mc_number = request.args.get('mc_number')
+    
+    # Validate required query parameter
+    if not mc_number or not webKey:
+        return jsonify({"error": "The both mc_number and webKey are required."}), 400
+
+    # Base URL for the external service
+    base_url = "https://mobile.fmcsa.dot.gov/qc/services/carriers/"
+    api_url = f"{base_url}{mc_number}?webKey={webKey}"
+
+    try:
+        # Make the external API call
+        response = requests.get(api_url)
+        response.raise_for_status()  # Raise HTTPError for bad responses (4xx and 5xx)
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+        
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
     
