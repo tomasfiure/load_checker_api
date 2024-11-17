@@ -100,13 +100,19 @@ def get_carrier_info():
     """
     Makes a GET call to the FMCAS carrier service with the provided API key and MC number.
     """
-    # Extract query parameters
-    webKey = request.args.get('webKey')
-    mc_number = request.args.get('mc_number')
-    
-    # Validate required query parameter
+    # Filter query parameters to include only 'webKey' and 'mc_number'
+    query_params = {
+        key: value for key, value in request.args.items()
+        if key in ["webKey", "mc_number"]
+    }
+
+    # Extract the specific query parameters
+    webKey = query_params.get('webKey')
+    mc_number = query_params.get('mc_number')
+
+    # Validate required query parameters
     if not mc_number or not webKey:
-        return jsonify({"error": "The both mc_number and webKey are required."}), 400
+        return jsonify({"error": "Both 'mc_number' and 'webKey' are required."}), 400
 
     # Base URL for the external service
     base_url = "https://mobile.fmcsa.dot.gov/qc/services/carriers/"
