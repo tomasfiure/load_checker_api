@@ -3,6 +3,7 @@ from database import get_db
 from models import APIKey
 from functools import wraps
 from sqlalchemy import text
+import requests
 
 app = Flask(__name__)
 
