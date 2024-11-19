@@ -56,6 +56,41 @@ def get_load_details(reference_number):
     finally:
         db.close()
 
+@app.route("/loads", methods=["POST"])
+@require_api_key
+def post_load_details():
+    """
+    Retrieve load details based on a reference number provided in the POST request body.
+    """
+    # Extract JSON payload
+    request_data = request.get_json()
+
+    # Extract the reference number from the payload
+    reference_number = request_data.get("reference_number")
+
+    # Validate that a reference number is provided
+    if not reference_number:
+        return jsonify({"error": "reference_number is required in the request body"}), 400
+
+    db = next(get_db())
+
+    try:
+        # Query the database for the specific reference number
+        query = text("SELECT * FROM shipping_rates WHERE reference_number = :reference_number")
+        result = db.execute(query, {"reference_number": reference_number}).mappings().fetchone()
+
+        # If no record is found, return a 404 error
+        if result is None:
+            return jsonify({"error": "Load not found"}), 404
+
+        # Convert the result to a dictionary and return as JSON
+        load_details = dict(result)
+        return jsonify(load_details)
+
+    finally:
+        db.close()
+
+
 @app.route("/search", methods=["GET"])
 @require_api_key
 def search_loads():
