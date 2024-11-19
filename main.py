@@ -11,7 +11,7 @@ app = Flask(__name__)
 def require_api_key(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        api_key = request.headers.get("X-API-Key") or request.args.get("api_key")
+        api_key = request.headers.get("X-API-Key") or request.args.get("api_key") or (request.get_json() or {}).get("api_key")
         
         if not api_key:
             return jsonify({"error": "API key is missing"}), 401
