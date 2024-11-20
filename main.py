@@ -132,7 +132,7 @@ def search_loads():
 
 @app.route("/search", methods=["POST"])
 @require_api_key
-def search_loads():
+def post_search_loads():
     """
     Search loads by a single query parameter (e.g., origin, destination, or equipment_type) in the JSON body.
     """
